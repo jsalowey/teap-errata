@@ -68,48 +68,58 @@
    the same capability to export EMSK.  In order to maintain maximum
    flexibility while prevent downgrading attack, the following mechanism
    is in place.
-
+   
    On the sender of the Crypto-Binding TLV side:
 
      If the EMSK is not available, then the sender computes the Compound
-     MAC using the MSK of the inner method.
+     MAC using the CMK generated from MSK (CMK-MSK) of the inner method.
 
      If the EMSK is available and the sender's policy accepts MSK-based
      MAC, then the sender computes two Compound MAC values.  The first
-     is computed with the EMSK.  The second one is computed using the
-     MSK.  Both MACs are then sent to the other side.
+     is computed with the CMK generated from the EMSK (CMK-EMSK).  The
+     second one is computed using the CMK-MSK.  Both MACs are
+     then sent to the other side.  This also means the sender must generate
+     both EMSK and MSK based S-IMCKs.
 
      If the EMSK is available but the sender's policy does not allow
-     downgrading to MSK-generated MAC, then the sender SHOULD only send
-     EMSK-based MAC.
+     downgrading to CMK-MSK MAC, then the sender SHOULD only send
+     a MAC computed from the CMK-EMSK.
 
    On the receiver of the Crypto-Binding TLV side:
 
-     If the EMSK is not available and an MSK-based Compound MAC was
+     If the EMSK is not available and an CMK-MSK Compound MAC was
      sent, then the receiver validates the Compound MAC and sends back
-     an MSK-based Compound MAC response.
+     an CMK-MSK Compound MAC response.
 
-     If the EMSK is not available and no MSK-based Compound MAC was
+     If the EMSK is not available and no CMK-MSK Compound MAC was
      sent, then the receiver handles like an invalid Crypto-Binding TLV
      with a fatal error.
 
-     If the EMSK is available and an EMSK-based Compound MAC was sent,
+     If the EMSK is available and a CMK-EMSK Compound MAC was sent,
      then the receiver validates it and creates a response Compound MAC
-     using the EMSK.
+     using the CMK-EMSK.
 
-     If the EMSK is available but no EMSK-based Compound MAC was sent
-     and its policy accepts MSK-based MAC, then the receiver validates
-     it using the MSK and, if successful, generates and returns an MSK-
+     If the EMSK is available but no CMK-EMSK Compound MAC was sent
+     and its policy accepts CMK-MSK MAC, then the receiver validates
+     it using the CMK-MSK and, if successful, generates and returns an MSK-
      based Compound MAC.
 
-     If the EMSK is available but no EMSK Compound MAC was sent and its
-     policy does not accept MSK-based MAC, then the receiver handles
+     If the EMSK is available but no CMK-EMSK Compound MAC was sent and its
+     policy does not accept CMK-MSK MAC, then the receiver handles
      like an invalid Crypto-Binding TLV with a fatal error.
 
-   If the ith inner method does not generate an EMSK or MSK, then IMSKi
-   is set to zero (e.g., MSKi = 32 octets of 0x00s).  If an inner method
-   fails, then it is not included in this calculation.  The derivation
-   of S-IMCK is as follows:
+The IMSK used is either the EMSK-based IMSK or the MSK based IMSK depending
+upon the rules outlined above. If the ith inner method does not generate an
+EMSK or MSK, then IMSKi is set to zero (e.g., MSKi = 32 octets of 0x00s).    
+It is possible that two S-IMCKs for a step may be generated based on the 
+rules above. In this case the S-IMCK for further calculations is chosen as 
+follows.  If the MAC based on the CMK-EMSK is verified then the S-IMCK 
+generated based on the EMSK is used.  Else, if the MAC based on the CMK-MSK 
+is verified then the S-IMCK generated based on the MSK is used.  If an inner 
+method fails or MAC verificationfails then S-IMCK is not used in further 
+calculation. 
+
+The derivation of S-IMCK is as follows:
 
       S-IMCK[0] = session_key_seed
       For j = 1 to n-1 do
