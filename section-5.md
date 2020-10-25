@@ -47,16 +47,21 @@
    [RFC5295].  The usage label used is "TEAPbindkey@ietf.org", and the
    length is 64 octets.  Optional data parameter is not used in the
    derivation.
+      
+     IMSK = First 32 octets of TLS-PRF(EMSK, "TEAPbindkey@ietf.org".org",
+        0x00 | 0x00 | 0x40)
 
-     IMSK = First 32 octets of TLS-PRF(EMSK, "TEAPbindkey@ietf.org" |
-     "\0" | 64)
+     where "|" denotes concatenation and the TLS-PRF is defined in
+     [RFC5246] as
 
-     where "|" denotes concatenation, EMSK is the EMSK from the inner
-     method, "TEAPbindkey@ietf.org" consists the ASCII value for the
-     label "TEAPbindkey@ietf.org" (without quotes), "\0" = is a NULL
-     octet (0x00 in hex), length is the 2-octet unsigned integer in
-     network byte order, and TLS-PRF is the PRF negotiated as part of
-     TLS handshake [RFC5246].
+       TLS-PRF(secret, label, seed) = P_<hash>(secret, label | seed)
+
+     The secret is the EMSK from the inner method, the label is
+     "TEAPbindkey@ietf.org" consisting of the ASCII value for the
+     label "TEAPbindkey@ietf.org" (without quotes),  the seed
+     consists of the "\0" null delimiter (0x00) and 2-octet unsigned
+     integer length in network byte order (0x00 | 0x4) specified
+     in [RFC5295].
 
    If an inner method does not support export of an Extended Master
    Session Key (EMSK), then IMSK is the MSK of the inner method.  The
