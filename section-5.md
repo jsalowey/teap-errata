@@ -115,8 +115,13 @@
       For j = 1 to n-1 do
            IMCK[j] = TLS-PRF(S-IMCK[j-1], "Inner Methods Compound Keys",
                 IMSK[j], 60)
-           S-IMCK[j] = first 40 octets of IMCK[j]
-           CMK[j] = last 20 octets of IMCK[j]
+     
+     S-IMCK[j] = first 40 octets of IMCK[j]
+     CMK[j] = last 20 octets of IMCK[j]
+
+     where TLS-PRF is the PRF negotiated as part of TLS handshake [RFC5246].
+     If no inner EAP method has been run the S-IMCK and CMK are generated as
+     above from S-IMCK[0].
 
    where TLS-PRF is the PRF negotiated as part of TLS handshake
    [RFC5246].
