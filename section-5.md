@@ -129,7 +129,7 @@ The derivation of S-IMCK is as follows:
       S-IMCK[0] = session_key_seed
       For j = 1 to n-1 do
            IMCK[j] = the first 60 bytes of TLS-PRF(S-IMCK[j-1], 
-           "Inner Methods Compound Keys", IMSK[j])
+             "Inner Methods Compound Keys", IMSK[j])
 
       where "|" denotes concatenation and the TLS-PRF is defined in
       [RFC5246] as
@@ -144,9 +144,6 @@ The derivation of S-IMCK is as follows:
 
       S-IMCK[j] = first 40 octets of IMCK[j]
       CMK[j] = last 20 octets of IMCK[j]
-
-   where TLS-PRF is the PRF negotiated as part of TLS handshake
-   [RFC5246].
 
 ### 5.3.  Computing the Compound MAC
 
